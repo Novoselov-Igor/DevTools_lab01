@@ -136,19 +136,26 @@ namespace Wintellect.PowerCollections.Tests
         public void GetEnumerator_Work_Test() // Проверка работы GetEnumerator метода
         {
             Stack<int> tests = new Stack<int>(5);
-            int[] pushes = new int[] { 23, 34, 5, 10 };
+            int[] pushes = new int[4];
 
-            foreach (int n in pushes)
-            {
-                tests.Push(n);
-            }
+            tests.Push(34);
+            tests.Push(23);
+            tests.Push(10);
+            tests.Push(4);
 
-            int i = pushes.Length - 1;
+            int i = 0;
             foreach (int num in tests)
             {
-                Assert.AreEqual(pushes[i], num);
-                i--;
+                pushes[i] = num;
+                i++;
             }
+
+            Assert.AreEqual(4, pushes[0]);
+            Assert.AreEqual(10, pushes[1]);
+            Assert.AreEqual(23, pushes[2]);
+            Assert.AreEqual(34, pushes[3]);
+
+            Assert.AreEqual(pushes.Length, tests.Count);
         }
     }
 }
