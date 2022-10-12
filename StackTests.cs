@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Wintellect.PowerCollections.Tests
@@ -39,14 +40,6 @@ namespace Wintellect.PowerCollections.Tests
         }
 
         [TestMethod]
-        public void StackConstructor_WithoutParameters_Test() // Проверка конструктора стека в случае когда в него ничто не передается
-        {
-            Stack<int> tests = new Stack<int>();
-
-            Assert.AreEqual(0, tests.Capacity); // Ожидается 0, потому что в конструктор не было ничего передано
-        }
-
-        [TestMethod]
         public void StackConstructor_WithParameters_Test() // Проверка работы конструктора при передаче параметров
         {
             Stack<bool> tests = new Stack<bool>(100);
@@ -61,7 +54,7 @@ namespace Wintellect.PowerCollections.Tests
             }
             catch (InvalidOperationException e)
             {
-                Assert.AreEqual("Введено отрицательное значение", e.Message); // Ожидается Exception с сообщением - "Введено отрицательное значение"
+                Assert.AreEqual("Размер стека не может быть отрицательным", e.Message); // Ожидается Exception с сообщением - "Введено отрицательное значение"
             }
         }
 
@@ -81,7 +74,7 @@ namespace Wintellect.PowerCollections.Tests
         [ExpectedException(typeof(InvalidOperationException))]
         public void PushMethod_Overflow_Test() // Проверка метода Push при переполнении размера стека (в данном случае размер - 0)
         {
-            Stack<int> tests = new Stack<int>();
+            Stack<int> tests = new Stack<int>(1);
 
             tests.Push(1);
             tests.Push(2);
@@ -136,26 +129,16 @@ namespace Wintellect.PowerCollections.Tests
         public void GetEnumerator_Work_Test() // Проверка работы GetEnumerator метода
         {
             Stack<int> tests = new Stack<int>(5);
-            int[] pushes = new int[4];
+            int[] expected = new int[] { 2, 7, 1, 75 };
 
-            tests.Push(34);
-            tests.Push(23);
-            tests.Push(10);
-            tests.Push(4);
-
-            int i = 0;
-            foreach (int num in tests)
+            foreach (int a in expected)
             {
-                pushes[i] = num;
-                i++;
+                tests.Push(a);
             }
 
-            Assert.AreEqual(4, pushes[0]);
-            Assert.AreEqual(10, pushes[1]);
-            Assert.AreEqual(23, pushes[2]);
-            Assert.AreEqual(34, pushes[3]);
+            var actual = from n in tests select n;
 
-            Assert.AreEqual(pushes.Length, tests.Count);
+            Assert.IsTrue(expected.Reverse().SequenceEqual(actual));
         }
     }
 }

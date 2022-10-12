@@ -12,10 +12,10 @@ namespace Wintellect.PowerCollections
 
         T[] values;
 
-        public Stack(int arrSize = 0)
+        public Stack(int arrSize)
         {
             if (arrSize < 0)
-                throw new InvalidOperationException("Введено отрицательное значение");
+                throw new InvalidOperationException("Размер стека не может быть отрицательным");
             values = new T[arrSize];
             Capacity = arrSize;
         }
