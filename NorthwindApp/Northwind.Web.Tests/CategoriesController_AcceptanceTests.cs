@@ -12,7 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Northwind.Web.Models
+namespace Northwind.Web.Tests
 {
     [TestClass]
     public class CategoriesControllerAcceptanceTests
@@ -32,7 +32,7 @@ namespace Northwind.Web.Models
             var links = document.Links
                 .OfType<IHtmlAnchorElement>()
                 .Select(l => l.Href)
-                .Where(x => x.Contains($"Categories"));
+                .Where(x => x.Contains("Categories"));
 
             links.Should().NotBeNull();
             links.Any().Should().BeTrue();
@@ -42,7 +42,7 @@ namespace Northwind.Web.Models
         public async Task Details_EditLink_ShouldBe_Correct()
         {
             var client = GetClient();
-            var response = await client.GetStringAsync(_categoriesPath + "/details/1");
+            var response = await client.GetStringAsync($"{_categoriesPath}/Details/1");
 
             var context = BrowsingContext.New(Configuration.Default);
             var document = context.OpenAsync(req => req.Content(response)).Result;
@@ -50,7 +50,7 @@ namespace Northwind.Web.Models
             var links = document.Links
                 .OfType<IHtmlAnchorElement>()
                 .Select(l => l.Href)
-                .Where(x => x.Contains("categories/edit/1"));
+                .Where(x => x.Contains("Categories/Edit/1"));
 
             links.Should().NotBeNull();
             links.Any().Should().BeTrue();
@@ -60,15 +60,13 @@ namespace Northwind.Web.Models
         public async Task Details_ShouldContain_Data()
         {
             var client = GetClient();
-            var response = await client.GetStringAsync(_categoriesPath + "/details/1");
+            var response = await client.GetStringAsync($"{_categoriesPath}/Details/1");
 
             var result = GetCategory(response);
 
             result.Should().NotBeNull();
             result.CategoryName.Should().NotBeEmpty();
             result.Description.Should().NotBeEmpty();
-            result.ProductCount.Should().BeGreaterThan(0);
-            result.ProductName.Should().NotBeEmpty();
         }
 
         [TestMethod]
@@ -117,15 +115,13 @@ namespace Northwind.Web.Models
         public async Task Delete_ShouldContain_Data()
         {
             var client = GetClient();
-            var response = await client.GetStringAsync(_categoriesPath + "/delete/1");
+            var response = await client.GetStringAsync($"{_categoriesPath}/Delete/2");
 
             var result = GetCategory(response);
 
             result.Should().NotBeNull();
             result.CategoryName.Should().NotBeEmpty();
             result.Description.Should().NotBeEmpty();
-            result.ProductCount.Should().BeGreaterThan(0);
-            result.ProductName.Should().NotBeEmpty();
         }
         private static HttpClient GetClient() => new();
 
@@ -139,8 +135,6 @@ namespace Northwind.Web.Models
 
             category.CategoryName = ddElements.ElementAtOrDefault(0)?.InnerHtml.Trim() ?? "";
             category.Description = ddElements.ElementAtOrDefault(1)?.InnerHtml.Trim() ?? "";
-            category.ProductCount = Convert.ToInt32(ddElements.ElementAtOrDefault(2)?.InnerHtml.Trim() ?? "");
-            category.ProductName = ddElements.ElementAtOrDefault(3)?.InnerHtml.Trim() ?? "";
 
             return category;
         }

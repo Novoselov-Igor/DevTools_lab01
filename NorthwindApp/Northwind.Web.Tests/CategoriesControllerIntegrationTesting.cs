@@ -319,27 +319,22 @@ namespace Northwind.Web.Tests
                 .Generate();
             context.SaveChanges();
 
-            var id = category.CategoryId;
-
             var client = GetTestHttpClient(() => NorthwindContextHelpers.GetInMemoryContext(),
                 new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
-            var createForm = await client.GetStringAsync($"/categories/delete/1");
+            var createForm = await client.GetStringAsync("/categories/delete/1");
             var verificationToken = GetRequestVerificationToken(createForm);
 
             var formContent = new MultipartFormDataContent
             {
                 { new StringContent(verificationToken), AspNetVerificationTokenName }
             };
-            var response = await client.PostAsync($"/categories/delete/1", formContent);
+            var response = await client.PostAsync("/categories/delete/1", formContent);
 
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-            NorthwindContextHelpers.GetInMemoryContext().Categories.Any(x => x.CategoryId == id).Should().BeTrue();
+            NorthwindContextHelpers.GetInMemoryContext().Categories.Any(x => x.CategoryId == 1).Should().BeTrue();
         }
 
-        private static HttpClient GetTestHttpClient(
-            Func<NorthwindContext>? context = null,
-            WebApplicationFactoryClientOptions? clientOptions = null
-            )
+        private static HttpClient GetTestHttpClient(Func<NorthwindContext>? context = null,WebApplicationFactoryClientOptions? clientOptions = null)
         {
             var factory = new WebApplicationFactory<Program>();
             if (context != null)

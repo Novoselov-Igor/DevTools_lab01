@@ -7,7 +7,7 @@ using Bogus;
 using Northwind.Model;
 using Northwind.Web.Tests.TestDataGenerators;
 
-namespace Northwind.Web.Controllers
+namespace Northwind.Web.Tests.TestDataGenerators
 {
     public class ProductsGeneration : ITestDataGenerator<Product>
     {
