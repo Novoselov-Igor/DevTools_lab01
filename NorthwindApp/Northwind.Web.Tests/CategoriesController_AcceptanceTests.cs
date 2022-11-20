@@ -34,7 +34,6 @@ namespace Northwind.Web.Tests
                 .Select(l => l.Href)
                 .Where(x => x.Contains("Categories"));
 
-            links.Should().NotBeNull();
             links.Any().Should().BeTrue();
         }
 
@@ -52,7 +51,6 @@ namespace Northwind.Web.Tests
                 .Select(l => l.Href)
                 .Where(x => x.Contains("Categories/Edit/1"));
 
-            links.Should().NotBeNull();
             links.Any().Should().BeTrue();
         }
 
@@ -64,7 +62,6 @@ namespace Northwind.Web.Tests
 
             var result = GetCategory(response);
 
-            result.Should().NotBeNull();
             result.CategoryName.Should().NotBeEmpty();
             result.Description.Should().NotBeEmpty();
         }
@@ -75,8 +72,8 @@ namespace Northwind.Web.Tests
             var client = GetClient();
             var response = await client.GetStringAsync(_categoriesPath);
 
-            var detailsExpect = new Regex(@".*\\Details.\d");
-            var deleteExpect = new Regex(@".*\\Delete.\d");
+            var detailsRegex = new Regex(@".*\\Details.\d");
+            var deleteRegex = new Regex(@".*\\Delete.\d");
             var editRegex = new Regex(@".*\\Edit.\d");
 
             var context = BrowsingContext.New(Configuration.Default);
@@ -87,12 +84,11 @@ namespace Northwind.Web.Tests
                 .Select(l => l.Href)
                 .Where(x => x.Contains("Categories"));
 
-            links.Should().NotBeNull();
-            links.Count(x => detailsExpect.IsMatch(x))
-                .Should().Be(links.Count(x => editRegex.IsMatch(x)));
-            links.Count(x => editRegex.IsMatch(x))
-                .Should().Be(links.Count(x => deleteExpect.IsMatch(x)));
+            var detailsExpect = links.Count(c => detailsRegex.IsMatch(c));
+            var deleteExpect = links.Count(c => deleteRegex.IsMatch(c));
+            var editExpect = links.Count(c => editRegex.IsMatch(c));
 
+            detailsExpect.Should().Be(deleteExpect).And.Be(editExpect);
         }
 
         [TestMethod]
@@ -119,7 +115,6 @@ namespace Northwind.Web.Tests
 
             var result = GetCategory(response);
 
-            result.Should().NotBeNull();
             result.CategoryName.Should().NotBeEmpty();
             result.Description.Should().NotBeEmpty();
         }
