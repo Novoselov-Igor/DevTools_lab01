@@ -97,14 +97,16 @@ namespace Northwind.Web.Tests
             var client = GetClient();
             var response = await client.GetStringAsync(_categoriesPath);
 
+            var context = new NorthwindContext();
+            var categories = context.Categories.ToList();
+
             var result = GetResultCategories(response).ToList();
 
             result.Should().NotBeNullOrEmpty();
-            result.ForEach((x) =>
-            {
-                x.CategoryName.Should().NotBeEmpty();
-                x.Description.Should().NotBeEmpty();
-            });
+            result.Should().BeEquivalentTo(categories,
+                options => options
+                .Excluding(c => c.Products)
+                .Excluding(c => c.Picture));
         }
 
         [TestMethod]

@@ -125,7 +125,7 @@ namespace Northwind.Web.Tests
         }
 
         [TestMethod]
-        public async Task Details_ShouldExist()
+        public async Task Details_StatusCode_ShouldBe_OK()
         {
             var context = NorthwindContextHelpers.GetInMemoryContext(true);
             var categoryGenerator = new CategoryGenerator(context);
@@ -135,21 +135,23 @@ namespace Northwind.Web.Tests
             var client = GetTestHttpClient(
                 () => NorthwindContextHelpers.GetInMemoryContext());
 
-            var response = await client.GetStringAsync("/categories/details/1");
+            var response = await client.GetAsync("/categories/details/1");
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
         public async Task Details_StatusCode_ShouldBe_NotFound_WhenIndexOutOfRange()
         {
             var client = GetTestHttpClient(
                 () => NorthwindContextHelpers.GetInMemoryContext());
 
-            var response = await client.GetStringAsync("/categories/details/0");
+            var response = await client.GetAsync("/categories/details/0");
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
         public async Task Details_StatusCode_ShouldBe_NotFound_WhenCategoryIsNull()
         {
             var context = NorthwindContextHelpers.GetInMemoryContext(true);
@@ -158,7 +160,9 @@ namespace Northwind.Web.Tests
             var client = GetTestHttpClient(
                 () => NorthwindContextHelpers.GetInMemoryContext());
 
-            var response = await client.GetStringAsync("/categories/details/1");
+            var response = await client.GetAsync("/categories/details/1");
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
         }
 
         [TestMethod]
@@ -293,6 +297,8 @@ namespace Northwind.Web.Tests
                 });
 
             var response = await client.PostAsync("/categories/delete/1", formContent);
+            var newCategory = context.Categories.First();
+
 
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.Found);
         }
@@ -329,9 +335,14 @@ namespace Northwind.Web.Tests
                 { new StringContent(verificationToken), AspNetVerificationTokenName }
             };
             var response = await client.PostAsync("/categories/delete/1", formContent);
+            var newCategory = context.Categories.First();
 
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-            NorthwindContextHelpers.GetInMemoryContext().Categories.Any(x => x.CategoryId == 1).Should().BeTrue();
+            newCategory.Should().BeEquivalentTo(category,
+                options => options
+                    .Including(c => c.CategoryName)
+                    .Including(c => c.Description)
+                    .Including(c => c.Picture));
         }
 
         private static HttpClient GetTestHttpClient(Func<NorthwindContext>? context = null,WebApplicationFactoryClientOptions? clientOptions = null)
