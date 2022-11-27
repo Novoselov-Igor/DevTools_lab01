@@ -136,7 +136,14 @@ namespace Northwind.Web.Tests
                 () => NorthwindContextHelpers.GetInMemoryContext());
 
             var response = await client.GetAsync("/categories/details/1");
+            var resp = response.Content.ReadAsStringAsync();
+            var doc = resp.Result;
 
+            string? expCategoryName = categories.First().CategoryName.ToString();
+            string? expDescription = categories.First().Description.ToString();
+
+            doc.Should().ContainEquivalentOf(expCategoryName);
+            doc.Should().ContainEquivalentOf(expDescription);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         }
 

@@ -60,13 +60,13 @@ namespace Northwind.Web.Tests
             var client = GetClient();
             var response = await client.GetStringAsync($"{_categoriesPath}/Details/1");
 
-            var context = new NorthwindContext();
-            var categories = context.Categories.Where(c => c.CategoryId == 1);
-
             var result = GetCategory(response);
 
-            result.CategoryName.Should().Be(categories.First().CategoryName);
-            result.Description.Should().Be(categories.First().Description);
+            string expCategoryName = "Beverages";
+            string expDescription = "Soft drinks, coffees, teas, beers, and ales";
+
+            result.CategoryName.Should().Be(expCategoryName);
+            result.Description.Should().Be(expDescription);
         }
 
         [TestMethod]
@@ -100,8 +100,7 @@ namespace Northwind.Web.Tests
             var client = GetClient();
             var response = await client.GetStringAsync(_categoriesPath);
 
-            var context = new NorthwindContext();
-            var categories = context.Categories.ToList();
+            var categories = GetCategoriesList();
 
             var result = GetResultCategories(response).ToList();
 
@@ -124,6 +123,62 @@ namespace Northwind.Web.Tests
             result.Description.Should().NotBeEmpty();
         }
         private static HttpClient GetClient() => new();
+
+        private static List<Category> GetCategoriesList ()
+        {
+            List<Category> categories = new List<Category>()
+            {
+                new Category()
+                {
+                    CategoryId = 1,
+                    CategoryName = "Beverages",
+                    Description = "Soft drinks, coffees, teas, beers, and ales",
+                },
+                new Category()
+                {
+                    CategoryId = 2,
+                    CategoryName = "Condiments",
+                    Description = "Sweet and savory sauces, relishes, spreads, and seasonings",
+                },
+                new Category()
+                {
+                    CategoryId = 3,
+                    CategoryName = "Confections",
+                    Description = "Desserts, candies, and sweet breads"
+                },
+                new Category()
+                {
+                    CategoryId = 4,
+                    CategoryName = "Dairy Products",
+                    Description = "Cheeses"
+                },
+                new Category()
+                {
+                    CategoryId = 5,
+                    CategoryName = "Grains/Cereals",
+                    Description = "Breads, crackers, pasta, and cereal"
+                },
+                new Category()
+                {
+                    CategoryId = 6,
+                    CategoryName = "Meat/Poultry",
+                    Description = "Prepared meats"
+                },
+                new Category()
+                {
+                    CategoryId = 7,
+                    CategoryName = "Produce",
+                    Description = "Dried fruit and bean curd"
+                },
+                new Category()
+                {
+                    CategoryId = 8,
+                    CategoryName = "Seafood",
+                    Description = "Seaweed and fish"
+                }
+            };
+            return categories;
+        }
 
         private static CategoryViewModel GetCategory(string htmlSource)
         {
