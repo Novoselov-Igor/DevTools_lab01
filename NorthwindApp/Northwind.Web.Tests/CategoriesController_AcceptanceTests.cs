@@ -60,10 +60,13 @@ namespace Northwind.Web.Tests
             var client = GetClient();
             var response = await client.GetStringAsync($"{_categoriesPath}/Details/1");
 
+            var context = new NorthwindContext();
+            var categories = context.Categories.Where(c => c.CategoryId == 1);
+
             var result = GetCategory(response);
 
-            result.CategoryName.Should().NotBeEmpty();
-            result.Description.Should().NotBeEmpty();
+            result.CategoryName.Should().Be(categories.First().CategoryName);
+            result.Description.Should().Be(categories.First().Description);
         }
 
         [TestMethod]
