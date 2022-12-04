@@ -17,31 +17,18 @@ namespace Northwind.Web.Models
         
         [Display(Name = "Изображение")]
         public IFormFile? Picture { get; set; }
-
-        [Display(Name = "Товары")]
-        public string ProductName { get; set; } = "Нет товаров";
-
-        [Display(Name = "Количество товаров")]
-        public int ProductCount { get; set; }
     }
 
     public static class CategoryViewModelExtensions 
     {
         public static CategoryViewModel ToViewModel(this Category category)
         {
-            string product = string.Join(", ", category.Products?.Take(3).Select(x => x.ProductName));
-
-            if (string.IsNullOrEmpty(product))
-                product = "Нет товаров";
-
             return new CategoryViewModel
             {
                 CategoryId = category.CategoryId,
                 CategoryName = category.CategoryName,
                 Description = category.Description,
                 Picture = null,
-                ProductName = product,
-                ProductCount = category.Products?.Count ?? 0
             };
         }
 

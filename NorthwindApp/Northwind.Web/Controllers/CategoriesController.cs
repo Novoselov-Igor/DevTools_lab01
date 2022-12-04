@@ -30,7 +30,6 @@ namespace Northwind.Web.Controllers
             }
 
             var category = await context.Categories
-                .Include(c => c.Products)
                 .FirstOrDefaultAsync(m => m.CategoryId == id);
             if (category == null)
             {
@@ -114,7 +113,6 @@ namespace Northwind.Web.Controllers
             }
 
             var category = await context.Categories
-                .Include(c => c.Products)
                 .FirstOrDefaultAsync(m => m.CategoryId == id);
             if (category == null)
             {
@@ -132,16 +130,15 @@ namespace Northwind.Web.Controllers
             {
                 return Problem("Entity set 'NorthwindContext.Categories'  is null.");
             }
-            var category = await context.Categories
-                .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.CategoryId == id);
+            var category = await context.Categories.FindAsync(id);
             if (category != null)
             {
-                if (category.Products.Any())
+                var haveProducts = context.Products.Where(p => p.Category == category).Any();
+                
+                if (haveProducts) 
                 {
-                    var viewModel = category.ToViewModel();
-                    ModelState.AddModelError("", $"Нельзя удалять категории с привязанными товарами! ({viewModel.ProductName}...)");
-                    return View(viewModel);
+                    ModelState.AddModelError("", "Нельзя удалять категории с привязанными товарами!");
+                    return View(category.ToViewModel());
                 }
                 context.Categories.Remove(category);
             }
