@@ -45,5 +45,10 @@ namespace Northwind.Web.Tests
 
             result = userManager.AddPasswordAsync(user, password).Result;
         }
+
+        public IdentityUser GetUser()
+        {
+            return userManager.Users.FirstOrDefault();
+        }
     }
 }

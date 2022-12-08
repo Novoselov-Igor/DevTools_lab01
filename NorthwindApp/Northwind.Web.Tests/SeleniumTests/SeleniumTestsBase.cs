@@ -9,8 +9,8 @@ using WebDriverManager.DriverConfigs.Impl;
 namespace Northwind.Web.Tests.SeleniumTests
 {
     //[TestFixture(BrowserTypes.Firefox)]
-    [TestFixture(BrowserTypes.Edge)]
-    //[TestFixture(BrowserTypes.Chrome)]
+    //[TestFixture(BrowserTypes.Edge)]
+    [TestFixture(BrowserTypes.Chrome)]
     public class SeleniumTestsBase
     {
         protected IWebDriver webDriver;

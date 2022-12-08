@@ -13,7 +13,7 @@ namespace Northwind.Web.Tests.SeleniumTests.Pages
         {
         }
 
-        public IList<CategoryRowItem> Categories { get; private set; }
+        public IList<RegistrationItems> Categories { get; private set; }
 
         public CreateCategoryPage GoToCreateNewCategoryPage()
         {
@@ -23,7 +23,7 @@ namespace Northwind.Web.Tests.SeleniumTests.Pages
     }
 
     [ElementLocator(How = How.CssSelector, Using = "tr[data-tid|='category-row']")]
-    public class CategoryRowItem : HtmlElement
+    public class RegistrationItems : HtmlElement
     {
         [FindsBy(How = How.CssSelector, Using = "td[data-tid='category-name']")]
         private HtmlLabel categoryName;
@@ -34,7 +34,7 @@ namespace Northwind.Web.Tests.SeleniumTests.Pages
         [FindsBy(How = How.CssSelector, Using = "td[data-tid='category-picture'] > img")]
         private HtmlImage picture;
 
-        public CategoryRowItem(IWebElement webElement) : base(webElement) { }
+        public RegistrationItems(IWebElement webElement) : base(webElement) { }
 
         public int CategoryId => int.Parse(GetDomAttribute("data-tid")?.Split("-").Last() ?? "-1");
         public string CategoryName => categoryName.Text;
