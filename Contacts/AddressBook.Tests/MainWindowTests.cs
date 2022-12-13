@@ -72,39 +72,37 @@ namespace AddressBook.Tests
 
             Contact cont = new Contact();
 
-            mainWindow.FindFirstDescendant(c => c.ByText("New Contact")).Click();
+            var contactWindow = mainWindow.OpenNewContactWindow();
             Thread.Sleep(1000);
 
-            var contactWindow = app.GetMainWindow(automation).As<ContactWindow>();
             Bogus.Person person = new Bogus.Person();
 
             var personName = new Microsoft.Communications.Contacts.Name(person.FirstName, "", person.LastName, NameCatenationOrder.GivenFamily);
             var personPhoneNumber = new PhoneNumber(person.Phone);
             var personAddress = new PhysicalAddress("", person.Address.Street, person.Address.City, person.Address.State, "", "", "", "");
 
-            var nameBox = contactWindow.FindFirstDescendant(c => c.ByName("Name")).FindAllChildren();
-            nameBox[1].AsTextBox().Text = person.FullName;
-            nameBox[3].AsTextBox().Text = person.FirstName;
-            nameBox[7].AsTextBox().Text = person.LastName;
-            nameBox[9].AsTextBox().Text = person.UserName;
+            contactWindow.formattedName = person.FullName;
+            contactWindow.firstName = person.FirstName;
+            contactWindow.lastName = person.LastName;
+            contactWindow.nickName = person.UserName;
 
-            contactWindow.FindFirstDescendant(c => c.ByName("Phone Numbers")).Click();
+            contactWindow.phoneNumbersButton.Click();
 
             Thread.Sleep(1000);
 
-            var homePhoneBox = contactWindow.FindFirstDescendant(c => c.ByName("Home Phone Numbers")).FindAllChildren();
-            homePhoneBox[1].AsTextBox().Text = person.Phone;
+            contactWindow.phone = person.Phone;
 
-            contactWindow.FindFirstDescendant(c => c.ByName("Locations")).Click();
+            contactWindow.locationsButton.Click();
             
             Thread.Sleep(1000);
 
-            var locationBox = contactWindow.FindFirstDescendant(c => c.ByName("Work Address")).FindAllChildren().First().FindAllChildren();
-            locationBox[1].AsTextBox().Text = person.Address.Street;
-            locationBox[3].AsTextBox().Text = person.Address.City;
-            locationBox[5].AsTextBox().Text = person.Address.State;
+            contactWindow = mainWindow.OpenNewContactWindow();
+            contactWindow.street = person.Address.Street;
+            contactWindow.city = person.Address.City;
+            contactWindow.state = person.Address.State;
 
-            contactWindow.FindFirstDescendant(c => c.ByName("Save Changes")).Click();
+            contactWindow.saveChangesButton.Click();
+
             var contact = contactManager.GetContactCollection().First();
 
             contact.Names.Default.Should().BeEquivalentTo(personName);
@@ -132,28 +130,27 @@ namespace AddressBook.Tests
             var personAddress = new PhysicalAddress("", person.Address.Street, person.Address.City, person.Address.State, "", "", "", "");
 
             var nameBox = contactWindow.FindFirstDescendant(c => c.ByName("Name")).FindAllChildren();
-            nameBox[1].AsTextBox().Text = person.FullName;
-            nameBox[3].AsTextBox().Text = person.FirstName;
-            nameBox[7].AsTextBox().Text = person.LastName;
-            nameBox[9].AsTextBox().Text = person.UserName;
+            contactWindow.formattedName = person.FullName;
+            contactWindow.firstName = person.FirstName;
+            contactWindow.lastName = person.LastName;
+            contactWindow.nickName = person.UserName;
 
-            contactWindow.FindFirstDescendant(c => c.ByName("Phone Numbers")).Click();
+            contactWindow.phoneNumbersButton.Click();
 
             Thread.Sleep(1000);
 
-            var homePhoneBox = contactWindow.FindFirstDescendant(c => c.ByName("Home Phone Numbers")).FindAllChildren();
-            homePhoneBox[1].AsTextBox().Text = person.Phone;
+            contactWindow.phone = person.Phone;
 
-            contactWindow.FindFirstDescendant(c => c.ByName("Locations")).Click();
+            contactWindow.locationsButton.Click();
             
             Thread.Sleep(1000);
 
-            var locationBox = contactWindow.FindFirstDescendant(c => c.ByName("Work Address")).FindAllChildren().First().FindAllChildren();
-            locationBox[1].AsTextBox().Text = person.Address.Street;
-            locationBox[3].AsTextBox().Text = person.Address.City;
-            locationBox[5].AsTextBox().Text = person.Address.State;
+            contactWindow.street = person.Address.Street;
+            contactWindow.city = person.Address.City;
+            contactWindow.state = person.Address.State;
 
-            contactWindow.FindFirstDescendant(c => c.ByName("Save Changes")).Click();
+            contactWindow.saveChangesButton.Click();
+
             var contact = contactManager.GetContactCollection().First();
 
             contact.Names.Default.Should().BeEquivalentTo(personName);
@@ -171,10 +168,10 @@ namespace AddressBook.Tests
 
             var expected = contactManager.GetContactCollection().Count();
 
-            var contact = mainWindow.FindFirstDescendant(cf => cf.ByAutomationId("_contactPanel")).FindAllChildren(cf => cf.ByClassName("ListBoxItem"));
-            contact[0].Click();
+            var contact = mainWindow.Contacts.First();
+            contact.Click();
 
-            mainWindow.Menu.FindFirstDescendant(c => c.ByAutomationId("_deleteContactButton")).Click();
+            mainWindow.deleteButton.Click();
 
             var result = contactManager.GetContactCollection().Count();
 
@@ -195,17 +192,15 @@ namespace AddressBook.Tests
             contact.Names.Add(personName);
             contactManager.AddContact(contact);
 
-            var search = mainWindow.FindFirstDescendant(m => m.ByAutomationId("_wordwheel")).AsTextBox();
-            search.Text = person.FirstName;
+            mainWindow.search = person.FirstName;
 
-            Thread.Sleep(2000);
+            Thread.Sleep(6000); //Возможно задержку придется еще выше поставить поскольку не всегда открывает тот контакт (через отладку все работает)
 
             var contactWindow = mainWindow.Contacts.First().OpenContactWindow();
 
             var expected = personName.GivenName + " " +personName.FamilyName;
-            var result = contactWindow.FindFirstDescendant(c => c.ByAutomationId("_header")).FindFirstChild(c => c.ByClassName("TextBlock")).Name;
 
-            result.Should().Be(expected);
+            contactWindow.name.Should().Be(expected);
 
             contactWindow.Close();
         }
