@@ -10,6 +10,9 @@ namespace AddressBook.Tests.Windows
 {
     public class MainWindow : Window
     {
+        private TextBox searchBox =>
+            FindFirstDescendant(s => s.ByAutomationId("_wordwheel")).AsTextBox();
+
         public MainWindow(FrameworkAutomationElementBase frameworkAutomationElement)
             :base(frameworkAutomationElement)
         {
@@ -24,6 +27,31 @@ namespace AddressBook.Tests.Windows
                 .FindAllChildren(cf => cf.ByClassName("ListBoxItem"))?
                 .Select(e => 
                     e.As<ContactItem>()) ?? Enumerable.Empty<ContactItem>();
+
+        public Button deleteButton => 
+            Menu.FindFirstDescendant(d => d.ByAutomationId("_deleteContactButton")).AsButton();
+
+        public string search
+        {
+            set { searchBox.Text = value; }
+        }
+
+        public ContactWindow? OpenNewContactWindow()
+        {
+            Menu.FindFirstDescendant(c => c.ByAutomationId("_newContactButton")).Click();
+
+            var windowResult = Retry.WhileNull(
+                () => Automation
+                    .GetDesktop()
+                    .FindFirstChild(cf =>
+                        cf.ByProcessId(Properties.ProcessId)
+                        .And(cf.ByName("Windows Contacts"))));
+
+            return windowResult.Success
+                ? windowResult.Result.As<ContactWindow>()
+                : null;
+        }
+
     }
 
     public class ContactItem : SelectionItemAutomationElement
